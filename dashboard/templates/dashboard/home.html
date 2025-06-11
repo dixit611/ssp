@@ -1,0 +1,204 @@
+{% extends 'dashboard/base.html' %}
+{% load static %}
+{% block content %}
+
+<section class="container text-center">
+  <h3>Welcome</h3>
+  <hr><br>
+
+  <div class="row row-cols-1 row-cols-md-4 g-4">
+    <div class="col">
+      <a href="#" class="text-decoration-none text-dark">
+        <div class="card shadow h-100">
+          <img src="{% static 'images/notes.jpg' %}" class="card-img-top" style="height: 200px; object-fit: cover;" alt="Notes">
+          <div class="card-body">
+            <h5 class="card-title">Notes</h5>
+            <p class="card-text">Create Notes to refer them later. They are stored permanently until deleted.</p>
+          </div>
+        </div>
+      </a>
+    </div>
+
+    <div class="col">
+      <a href="#" class="text-decoration-none text-dark">
+        <div class="card shadow h-100">
+          <img src="{% static 'images/homework.jpg' %}" class="card-img-top" style="height: 200px; object-fit: cover;" alt="Homework">
+          <div class="card-body">
+            <h5 class="card-title">Homework</h5>
+            <p class="card-text">Add homeworks and assign deadlines. They will be displayed prioritized by deadlines.</p>
+          </div>
+        </div>
+      </a>
+    </div>
+
+    <div class="col">
+      <a href="#" class="text-decoration-none text-dark">
+        <div class="card shadow h-100">
+          <img src="{% static 'images/youtube.jpg' %}" class="card-img-top" style="height: 200px; object-fit: cover;" alt="YouTube">
+          <div class="card-body">
+            <h5 class="card-title">YouTube</h5>
+            <p class="card-text">Search YouTube and select your desired video to play it on YouTube.</p>
+          </div>
+        </div>
+      </a>
+    </div>
+
+    <div class="col">
+      <a href="#" class="text-decoration-none text-dark">
+        <div class="card shadow h-100">
+          <img src="{% static 'images/todo.jpg' %}" class="card-img-top" style="height: 200px; object-fit: cover;" alt="To Do">
+          <div class="card-body">
+            <h5 class="card-title">To Do</h5>
+            <p class="card-text">Add your to-do lists for your day and remove them as you finish.</p>
+          </div>
+        </div>
+      </a>
+    </div>
+
+    <div class="col">
+      <a href="#" class="text-decoration-none text-dark">
+        <div class="card shadow h-100">
+          <img src="{% static 'images/books.jpg' %}" class="card-img-top" style="height: 200px; object-fit: cover;" alt="Books">
+          <div class="card-body">
+            <h5 class="card-title">Books</h5>
+            <p class="card-text">Browse books from a list of neatly organized book menu.</p>
+          </div>
+        </div>
+      </a>
+    </div>
+
+    <div class="col">
+      <a href="#" class="text-decoration-none text-dark">
+        <div class="card shadow h-100">
+          <img src="{% static 'images/dictionary.jpg' %}" class="card-img-top" style="height: 200px; object-fit: cover;" alt="Dictionary">
+          <div class="card-body">
+            <h5 class="card-title">Dictionary</h5>
+            <p class="card-text">A vocabulary from a book is troubling you? Enter the word, and the meaning will be shown.</p>
+          </div>
+        </div>
+      </a>
+    </div>
+
+    <div class="col">
+      <a href="#" class="text-decoration-none text-dark">
+        <div class="card shadow h-100">
+          <img src="{% static 'images/wiki.jpg' %}" class="card-img-top" style="height: 200px; object-fit: cover;" alt="Wikipedia">
+          <div class="card-body">
+            <h5 class="card-title">Wikipedia</h5>
+            <p class="card-text">Homework and Assignments? Search Wikipedia to get fast results.</p>
+          </div>
+        </div>
+      </a>
+    </div>
+
+    <div class="col">
+      <a href="#" class="text-decoration-none text-dark">
+        <div class="card shadow h-100">
+          <img src="{% static 'images/conversion.jpg' %}" class="card-img-top" style="height: 200px; object-fit: cover;" alt="Conversion">
+          <div class="card-body">
+            <h5 class="card-title">Conversion</h5>
+            <p class="card-text">Check out the conversion table to convert measurements to more familiar ones.</p>
+          </div>
+        </div>
+      </a>
+    </div>
+
+    <div class="col">
+      <a href="#" class="text-decoration-none text-dark">
+        <div class="card shadow h-100">
+          <img src="{% static 'images/coding.jpg' %}" class="card-img-top" style="height: 200px; object-fit: cover;" alt="Code Editor">
+          <div class="card-body">
+            <h5 class="card-title">Code Editor</h5>
+            <p class="card-text">Editor that supports many languages and features for development.</p>
+          </div>
+        </div>
+      </a>
+    </div>
+
+    <div class="col">
+      <a href="#" class="text-decoration-none text-dark">
+        <div class="card shadow h-100">
+          <img src="{% static 'images/duckduckgo.png' %}" class="card-img-top" style="height: 200px; object-fit: cover;" alt="DuckDuck Go">
+          <div class="card-body">
+            <h5 class="card-title">DuckDuck Go</h5>
+            <p class="card-text">Privacy-focused search engine offering anonymous and unbiased results.</p>
+          </div>
+        </div>
+      </a>
+    </div>
+
+    <div class="col">
+      <a href="#" class="text-decoration-none text-dark">
+        <div class="card shadow h-100">
+          <img src="{% static 'images/calculator.jpg' %}" class="card-img-top" style="height: 200px; object-fit: cover;" alt="Calculator">
+          <div class="card-body">
+            <h5 class="card-title">Scientific Calculator</h5>
+            <p class="card-text">Advanced online calculator with trigonometry, log, exponential, etc.</p>
+          </div>
+        </div>
+      </a>
+    </div>
+
+    <div class="col">
+      <a href="#" class="text-decoration-none text-dark">
+        <div class="card shadow h-100">
+          <img src="{% static 'images/pad.jpg' %}" class="card-img-top" style="height: 200px; object-fit: cover;" alt="Rough Writing">
+          <div class="card-body">
+            <h5 class="card-title">Rough Writing</h5>
+            <p class="card-text">Convert your handwriting to typed text. Sync and refine your notes.</p>
+          </div>
+        </div>
+      </a>
+    </div>
+
+    <div class="col">
+      <a href="#" class="text-decoration-none text-dark">
+        <div class="card shadow h-100">
+          <img src="{% static 'images/w3schools.png' %}" class="card-img-top" style="height: 200px; object-fit: cover;" alt="W3Schools">
+          <div class="card-body">
+            <h5 class="card-title">W3 School Technologies</h5>
+            <p class="card-text">Learn HTML, CSS, JavaScript, Python, SQL, and more with free tutorials.</p>
+          </div>
+        </div>
+      </a>
+    </div>
+
+    <div class="col">
+      <a href="#" class="text-decoration-none text-dark">
+        <div class="card shadow h-100">
+          <img src="{% static 'images/timer.jpg' %}" class="card-img-top" style="height: 200px; object-fit: cover;" alt="Stop Watch">
+          <div class="card-body">
+            <h5 class="card-title">Stop Watch</h5>
+            <p class="card-text">Measure elapsed time with split intervals and fullscreen mode.</p>
+          </div>
+        </div>
+      </a>
+    </div>
+
+    <div class="col">
+      <a href="#" class="text-decoration-none text-dark">
+        <div class="card shadow h-100">
+          <img src="{% static 'images/videocall.jpeg' %}" class="card-img-top" style="height: 200px; object-fit: cover;" alt="Video Calls">
+          <div class="card-body">
+            <h5 class="card-title">Video Calls</h5>
+            <p class="card-text">Real-time online meetings. Share video, screen, and presentations.</p>
+          </div>
+        </div>
+      </a>
+    </div>
+
+    <div class="col">
+      <a href="#" class="text-decoration-none text-dark">
+        <div class="card shadow h-100">
+          <img src="{% static 'images/hand-keyboard.jpg' %}" class="card-img-top" style="height: 200px; object-fit: cover;" alt="Typing Activity">
+          <div class="card-body">
+            <h5 class="card-title">Typing Activity</h5>
+            <p class="card-text">Practice your typing skills online with speed tests and games.</p>
+          </div>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+{% endblock content %}

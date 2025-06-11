@@ -1,0 +1,61 @@
+{% extends 'dashboard/base.html' %}
+{% load static %}
+{% block content %}
+
+<section class='text-center container'>
+    <h2>DuckDuckGo Search</h2>
+    <p>Enter your search query below to get results.</p>
+    <form method="post" action="">
+        {% csrf_token %}
+        <div class="mb-2 pe-3">
+         {{ form.as_p }}
+        </div>
+        <input class="btn btn-danger" type="submit" value="Search">
+    </form><br>
+
+    <div class="results-container">
+        {% if results %}
+            <h3>Search Results:</h3>
+            <ul>
+                {% for result in results %}
+                    <li>
+                        <h4><a href="{{ result.link }}" target="_blank">{{ result.title }}</a></h4>
+                        <p>{{ result.snippet }}</p>
+                    </li>
+                {% empty %}
+                    <p>No results found. Please try another search term.</p>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No results found. Please try another search term.</p>
+        {% endif %}
+    </div>
+</section>
+
+<style>
+    .btn-danger {
+        margin: 10px;
+    }
+    .results-container {
+        margin-top: 20px;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        background-color: #f9f9f9;
+    }
+    .results-container ul {
+        list-style-type: none;
+        padding: 0;
+    }
+    .results-container li {
+        margin-bottom: 15px;
+    }
+    .results-container li h4 {
+        margin: 0;
+    }
+    .results-container li p {
+        margin: 5px 0 0 0;
+    }
+</style>
+
+{% endblock content %}

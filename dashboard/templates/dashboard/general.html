@@ -1,0 +1,186 @@
+{% extends 'dashboard/base.html' %}
+{% load static %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Handwritten Canvas</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container">
+    <h1 class="my-4 text-center">Handwritten Canvas</h1>
+
+    <div class="mb-3">
+        <div class="mb-2 d-flex align-items-center flex-wrap">
+            <span class="mr-2">Select Color:</span>
+            <button class="btn btn-dark btn-sm rounded-circle mx-1" style="width:30px; height:30px;" onclick="changeColor('black')"></button>
+            <button class="btn btn-danger btn-sm rounded-circle mx-1" style="width:30px; height:30px;" onclick="changeColor('red')"></button>
+            <button class="btn btn-success btn-sm rounded-circle mx-1" style="width:30px; height:30px;" onclick="changeColor('green')"></button>
+            <button class="btn btn-primary btn-sm rounded-circle mx-1" style="width:30px; height:30px;" onclick="changeColor('blue')"></button>
+        </div>
+
+        <div class="mb-2 d-flex align-items-center flex-wrap">
+            <span class="mr-2">Brush Size:</span>
+            <button class="btn btn-secondary btn-sm mx-1" onclick="changeBrushSize(2)">●</button>
+            <button class="btn btn-secondary btn-sm mx-1" style="font-size: 1.5rem;" onclick="changeBrushSize(5)">●</button>
+            <button class="btn btn-secondary btn-sm mx-1" style="font-size: 2rem;" onclick="changeBrushSize(10)">●</button>
+        </div>
+
+        <div class="mb-2 d-flex align-items-center flex-wrap">
+            <span class="mr-2">Select Tool:</span>
+            <button class="btn btn-light border mx-1" onclick="changeTool('pencil')" title="Pencil">✏️</button>
+            <button class="btn btn-light border mx-1" onclick="changeTool('pen')" title="Pen">🖋️</button>
+            <button class="btn btn-light border mx-1" onclick="changeTool('sketch')" title="Sketch">🖌️</button>
+        </div>
+
+        <button class="btn btn-outline-danger mt-2" onclick="clearCanvas()">Clear Canvas</button>
+    </div>
+
+    <div class="mb-4">
+        <canvas id="canvas" class="w-100 border rounded" style="height:500px;"></canvas>
+    </div>
+
+    <div id="saved-documents" class="row">
+        <!-- Saved documents will appear here -->
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        let drawing = false;
+        let currentColor = 'black';
+        let currentBrushSize = 5;
+        let currentTool = 'pencil';
+
+        function resizeCanvas() {
+            canvas.width = canvas.offsetWidth;
+            canvas.height = 500;
+        }
+
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        function startDrawing(event) {
+            drawing = true;
+            ctx.beginPath();
+            const rect = canvas.getBoundingClientRect();
+            ctx.moveTo(event.clientX - rect.left, event.clientY - rect.top);
+        }
+
+        function draw(event) {
+            if (!drawing) return;
+            const rect = canvas.getBoundingClientRect();
+            ctx.strokeStyle = currentColor;
+            ctx.lineWidth = currentBrushSize;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            ctx.globalAlpha = currentTool === 'sketch' ? 0.3 : 1.0;
+            ctx.lineTo(event.clientX - rect.left, event.clientY - rect.top);
+            ctx.stroke();
+        }
+
+        function stopDrawing() {
+            drawing = false;
+            ctx.closePath();
+        }
+
+        canvas.addEventListener('mousedown', startDrawing);
+        canvas.addEventListener('mousemove', draw);
+        canvas.addEventListener('mouseup', stopDrawing);
+        canvas.addEventListener('mouseout', stopDrawing);
+
+        window.changeColor = function (color) {
+            currentColor = color;
+        };
+
+        window.changeBrushSize = function (size) {
+            currentBrushSize = size;
+        };
+
+        window.changeTool = function (tool) {
+            currentTool = tool;
+        };
+
+        window.clearCanvas = function () {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        };
+
+        // Save, search, edit, delete functionality (simplified version)
+
+        window.saveCanvas = function () {
+            const canvasData = canvas.toDataURL();
+            const title = prompt("Enter title for your document:");
+            if (title) {
+                fetch('/save_document/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    },
+                    body: JSON.stringify({ title: title, image: canvasData })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert('Document saved!');
+                    loadDocuments();
+                })
+                .catch(error => console.error('Error:', error));
+            }
+        };
+
+        window.deleteDocument = function (id) {
+            if (confirm("Are you sure you want to delete this document?")) {
+                fetch(`/delete_document/${id}/`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    }
+                }).then(response => {
+                    if (response.ok) {
+                        alert('Document deleted');
+                        loadDocuments();
+                    } else {
+                        alert('Failed to delete document');
+                    }
+                });
+            }
+        };
+
+        function loadDocuments() {
+            fetch('/get_documents/')
+                .then(response => response.json())
+                .then(data => {
+                    let docsHTML = '';
+                    data.forEach(doc => {
+                        docsHTML += `
+                            <div class="col-md-4 mb-3">
+                                <div class="card">
+                                    <img src="${doc.image}" class="card-img-top" alt="${doc.title}">
+                                    <div class="card-body">
+                                        <h5 class="card-title">${doc.title}</h5>
+                                        <button class="btn btn-warning btn-sm" onclick="editDocument(${doc.id})">Edit</button>
+                                        <button class="btn btn-danger btn-sm" onclick="deleteDocument(${doc.id})">Delete</button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    document.getElementById('saved-documents').innerHTML = docsHTML;
+                });
+        }
+
+        window.editDocument = function (id) {
+            alert('Edit functionality not implemented yet.');
+        };
+
+        loadDocuments();
+    });
+</script>
+</body>
+</html>
+{% endblock content %}

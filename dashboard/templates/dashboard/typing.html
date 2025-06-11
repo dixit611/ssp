@@ -1,0 +1,165 @@
+{% extends 'dashboard/base.html' %}
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center">Typing Practice</h2>
+
+    <!-- Display text to type -->
+    <p id="textToType" class="mt-4">{{ text_to_type }}</p>
+
+    <!-- Typing input area -->
+    <textarea id="typingInput" class="form-control mt-3" rows="5" placeholder="Start typing here..."></textarea>
+
+    <!-- Timer, speed, accuracy, and word count display -->
+    <div class="row mt-4">
+        <div class="col-3">
+            <label style="font-weight: bold; font-size: 1.2rem; color: #007bff;">Time:</label>
+            <span id="timerDisplay" style="font-weight: bold; font-size: 1.2rem; color: #007bff;">0:00</span>
+        </div>
+        <div class="col-3">
+            <label style="font-weight: bold; font-size: 1.2rem; color: #28a745;">WPM:</label>
+            <span id="wpmDisplay" style="font-weight: bold; font-size: 1.2rem; color: #28a745;">0</span>
+        </div>
+        <div class="col-3">
+            <label style="font-weight: bold; font-size: 1.2rem; color: #ffc107;">Accuracy:</label>
+            <span id="accuracyDisplay" style="font-weight: bold; font-size: 1.2rem; color: #ffc107;">0%</span>
+        </div>
+        <div class="col-3">
+            <label style="font-weight: bold; font-size: 1.2rem; color: #dc3545;">Word Count:</label>
+            <span id="wordCountDisplay" style="font-weight: bold; font-size: 1.2rem; color: #dc3545;">0</span>
+        </div>
+    </div>
+    
+
+    <!-- Buttons -->
+    <div class="mt-4">
+        <button id="startButton" class="btn btn-outline-primary">Start</button>
+        <button id="pauseButton" class="btn btn-outline-warning">Pause</button>
+        <button id="resetButton" class="btn btn-outline-danger">Reset</button>
+        {% comment %} <button id="closeButton" class="btn btn-secondary">Close</button> {% endcomment %}
+    </div>
+</div>
+
+<script>
+// Timer variables
+let timer;
+let timerRunning = false;
+let startTime;
+let timeElapsed = 0;
+let totalTyped = 0;
+let errors = 0;
+let wordCount = 0;
+let wpm = 0;
+
+// DOM elements
+const textToType = document.getElementById('textToType').innerText;
+const typingInput = document.getElementById('typingInput');
+const timerDisplay = document.getElementById('timerDisplay');
+const wpmDisplay = document.getElementById('wpmDisplay');
+const accuracyDisplay = document.getElementById('accuracyDisplay');
+const wordCountDisplay = document.getElementById('wordCountDisplay');
+const startButton = document.getElementById('startButton');
+const pauseButton = document.getElementById('pauseButton');
+const resetButton = document.getElementById('resetButton');
+
+// List of articles to exclude from the word count
+const excludedWords = ['a', 'an', 'the'];
+
+// Start the typing test
+startButton.addEventListener('click', function() {
+    if (!timerRunning) {
+        startTime = new Date();
+        timer = setInterval(updateTimer, 1000);
+        timerRunning = true;
+    }
+});
+
+// Pause the timer
+pauseButton.addEventListener('click', function() {
+    if (timerRunning) {
+        clearInterval(timer);
+        timerRunning = false;
+    }
+});
+
+// Reset the timer and inputs
+resetButton.addEventListener('click', function() {
+    clearInterval(timer);
+    timerRunning = false;
+    timeElapsed = 0;
+    totalTyped = 0;
+    errors = 0;
+    wpm = 0;
+    wordCount = 0;
+    typingInput.value = '';
+    updateDisplay();
+});
+
+// Typing event listener
+typingInput.addEventListener('input', function() {
+    const typedText = typingInput.value;
+    totalTyped = typedText.length;
+
+    // Calculate errors
+    errors = 0;
+    for (let i = 0; i < typedText.length; i++) {
+        if (typedText[i] !== textToType[i]) {
+            errors++;
+        }
+    }
+
+    // Calculate word count excluding articles and one-word sentences
+    wordCount = calculateWordCount(typedText);
+
+    // Calculate WPM (words per minute)
+    const minutesElapsed = timeElapsed / 60;
+    if (minutesElapsed > 0) {
+        wpm = Math.round(wordCount / minutesElapsed); // WPM = words typed / minutes
+    } else {
+        wpm = 0; // WPM is 0 if no time has passed yet
+    }
+
+    // Calculate accuracy
+    const accuracy = Math.max(0, Math.round(((totalTyped - errors) / totalTyped) * 100));
+
+    // Update display
+    updateDisplay(accuracy, wordCount);
+});
+
+// Update the timer display
+function updateTimer() {
+    timeElapsed++;
+    const minutes = Math.floor(timeElapsed / 60);
+    const seconds = timeElapsed % 60;
+    timerDisplay.innerText = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+}
+
+// Calculate word count excluding articles and one-word sentences
+function calculateWordCount(text) {
+    // Trim the text and split it by spaces
+    const words = text.trim().split(/\s+/);
+
+    // Filter out articles and one-word sentences
+    const filteredWords = words.filter(word => {
+        // Exclude articles
+        if (excludedWords.includes(word.toLowerCase())) {
+            return false;
+        }
+        // Exclude one-word sentences (that have a punctuation at the end)
+        const isOneWordSentence = /^[a-zA-Z]+[.!?]$/.test(word);
+        if (isOneWordSentence) {
+            return false;
+        }
+        return true;
+    });
+
+    return filteredWords.length;
+}
+
+// Update the WPM, accuracy, and word count display
+function updateDisplay(accuracy = 100, wordCount = 0) {
+    wpmDisplay.innerText = isNaN(wpm) ? 0 : wpm;
+    accuracyDisplay.innerText = isNaN(accuracy) ? '0%' : `${accuracy}%`;
+    wordCountDisplay.innerText = isNaN(wordCount) ? 0 : wordCount;
+}
+</script>
+{% endblock %}

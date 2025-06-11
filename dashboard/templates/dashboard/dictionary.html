@@ -1,0 +1,110 @@
+{% extends 'dashboard/base.html' %}
+{% load static %}
+{% block content %}
+<section class="text-center container">
+    <h2>Student Dictionary</h2>
+    <p>Enter any word to get the phonetics, definition and an example for the word</p>
+    
+    <form action="" method="post" class="mb-4">
+        {% csrf_token %}
+        <div class="mb-2 pe-3">
+            {{ form.as_p }}
+        </div>
+        <input class="btn btn-danger" type="submit" value="Submit">
+    </form>
+
+    <div class="content-section p-3 mt-5 text-start">
+        {% if input %}
+            <div class="custom-header mb-3">
+                <h2>{{ input }}</h2>
+                <h3>Hindi Meaning: {{ hindi_meaning }}</h3>
+                <h6>{{ phonetics }}</h6>
+
+                <!-- Audio Players -->
+                <audio id="englishPlayer" src="{{ english_audio_url }}" preload="auto"></audio>
+                <audio id="hindiPlayer" src="{{ hindi_audio_url }}" preload="auto"></audio>
+
+                <!-- Play Buttons -->
+                <button type="button" id="playEnglishButton" class="btn btn-primary m-2">
+                    <i class="fa fa-volume-up"></i> English
+                </button>
+                <button type="button" id="playHindiButton" class="btn btn-success m-2">
+                    <i class="fa fa-volume-up"></i> Hindi
+                </button>
+            </div>
+
+            <hr>
+
+            <!-- Definition and Example -->
+            <div class="mb-3">
+                <h4>Definition: {{ definition }}</h4>
+                {% if translated_definition %}
+                    <h4>Translated Definition (Hindi): {{ translated_definition }}</h4>
+                {% endif %}
+                <h4>Example: {{ example }}</h4>
+                {% if translated_example %}
+                    <h4>Translated Example (Hindi): {{ translated_example }}</h4>
+                {% endif %}
+            </div>
+
+            <!-- Synonyms -->
+            <div class="mb-3">
+                <p><strong>Synonyms:</strong>
+                    {% if synonyms %}
+                        {% for synonym in synonyms %}
+                            {{ synonym }}{% if not forloop.last %}, {% endif %}
+                        {% endfor %}
+                    {% else %}
+                        None
+                    {% endif %}
+                </p>
+
+                {% if translated_synonyms %}
+                    <p><strong>Translated Synonyms (Hindi):</strong>
+                        {% for translated_synonym in translated_synonyms %}
+                            {{ translated_synonym }}{% if not forloop.last %}, {% endif %}
+                        {% endfor %}
+                    </p>
+                {% endif %}
+            </div>
+
+            <hr>
+        {% else %}
+            <h2>Sorry, API request limit exceeded or word not found.</h2>
+        {% endif %}
+    </div>
+</section>
+{% endblock content %}
+
+<!-- Audio Playback Script -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const englishPlayer = document.getElementById('englishPlayer');
+        const hindiPlayer = document.getElementById('hindiPlayer');
+        const playEnglishButton = document.getElementById('playEnglishButton');
+        const playHindiButton = document.getElementById('playHindiButton');
+
+        if (playEnglishButton && englishPlayer) {
+            playEnglishButton.addEventListener('click', function () {
+                toggleAudio(englishPlayer);
+            });
+        }
+
+        if (playHindiButton && hindiPlayer) {
+            playHindiButton.addEventListener('click', function () {
+                toggleAudio(hindiPlayer);
+            });
+        }
+
+        function toggleAudio(player) {
+            if (player.paused) {
+                player.play().catch(error => {
+                    console.error("Playback failed:", error);
+                    alert("Audio could not be played. Check the source.");
+                });
+            } else {
+                player.pause();
+            }
+        }
+    });
+</script>

@@ -1,0 +1,184 @@
+{% extends 'dashboard/base.html' %}
+{% block content %}
+
+<div class="container mt-5">
+    <h1 class="text-center mb-4">Dynamic Timetable Calendar</h1>
+
+    <!-- View Buttons -->
+    <div class="d-flex justify-content-center mb-4 btn-group">
+        <button class="btn btn-info me-2" id="daily-view-btn">Daily View</button>
+        <button class="btn btn-info me-2" id="weekly-view-btn">Weekly View</button>
+        <button class="btn btn-info" id="monthly-view-btn">Monthly View</button>
+    </div>
+
+    <!-- Calendar -->
+    <div id="calendar" class="row"></div>
+</div>
+
+<!-- Add/Edit Event Modal -->
+<div class="modal fade" id="eventModal" tabindex="-1" aria-labelledby="eventModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <form id="event-form">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="eventModalLabel">Add/Edit Event</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="event-title" class="form-label">Event Title</label>
+                        <input type="text" class="form-control" id="event-title" placeholder="Enter event title" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="event-time" class="form-label">Event Time</label>
+                        <input type="text" class="form-control" id="event-time" placeholder="e.g., 10:00 AM - 11:00 AM" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">Save</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .btn.active {
+        background-color: #0d6efd !important;
+        color: white !important;
+        border: 1px solid #0d6efd !important;
+    }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    const calendar = document.getElementById('calendar');
+    const eventModal = new bootstrap.Modal(document.getElementById('eventModal'));
+    const eventForm = document.getElementById('event-form');
+    let events = [];
+    let selectedDay = null;
+    let editingEventIndex = null;
+    let currentView = 'monthly';
+
+    function renderCalendar(view = 'monthly') {
+        calendar.innerHTML = '';
+        currentView = view;
+        updateActiveButton(view);
+
+        let daysToRender = view === 'daily' ? 1 : view === 'weekly' ? 7 : 30;
+
+        for (let day = 1; day <= daysToRender; day++) {
+            const colDiv = document.createElement('div');
+            colDiv.className = 'col-lg-4 mb-3';
+
+            const dayCard = document.createElement('div');
+            dayCard.className = 'card shadow-sm';
+
+            const cardHeader = document.createElement('div');
+            cardHeader.className = 'card-header';
+            cardHeader.style.backgroundColor = '#343a40';
+            cardHeader.style.color = 'white';
+            cardHeader.innerHTML = `<strong>Day ${day}</strong>`;
+            dayCard.appendChild(cardHeader);
+
+            const cardBody = document.createElement('div');
+            cardBody.className = 'card-body';
+
+            const addEventBtn = document.createElement('button');
+            addEventBtn.className = 'btn btn-sm btn-outline-dark';
+            addEventBtn.textContent = 'Add Event';
+            addEventBtn.addEventListener('click', () => openEventModal(day));
+            cardBody.appendChild(addEventBtn);
+
+            const eventsContainer = document.createElement('div');
+            renderEvents(day, eventsContainer);
+            cardBody.appendChild(eventsContainer);
+
+            dayCard.appendChild(cardBody);
+            colDiv.appendChild(dayCard);
+            calendar.appendChild(colDiv);
+        }
+    }
+
+    function renderEvents(day, container) {
+        const dayEvents = events.filter(event => event.day === day);
+        dayEvents.forEach((event, index) => {
+            const eventRow = document.createElement('div');
+            eventRow.className = 'd-flex justify-content-between align-items-center mt-2 p-2 bg-light border rounded';
+            eventRow.innerHTML = `<span>${event.title} (${event.time})</span>`;
+
+            const actions = document.createElement('div');
+
+            const editBtn = document.createElement('button');
+            editBtn.className = 'btn btn-sm btn-warning me-1';
+            editBtn.textContent = 'Edit';
+            editBtn.addEventListener('click', () => editEvent(event, index));
+            actions.appendChild(editBtn);
+
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'btn btn-sm btn-danger';
+            deleteBtn.textContent = 'Delete';
+            deleteBtn.addEventListener('click', () => deleteEvent(index));
+            actions.appendChild(deleteBtn);
+
+            eventRow.appendChild(actions);
+            container.appendChild(eventRow);
+        });
+    }
+
+    function openEventModal(day) {
+        selectedDay = day;
+        editingEventIndex = null;
+        document.getElementById('event-title').value = '';
+        document.getElementById('event-time').value = '';
+        eventModal.show();
+    }
+
+    function editEvent(event, index) {
+        selectedDay = event.day;
+        editingEventIndex = index;
+        document.getElementById('event-title').value = event.title;
+        document.getElementById('event-time').value = event.time;
+        eventModal.show();
+    }
+
+    eventForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const title = document.getElementById('event-title').value;
+        const time = document.getElementById('event-time').value;
+
+        if (editingEventIndex !== null) {
+            events[editingEventIndex] = { day: selectedDay, title, time };
+        } else {
+            events.push({ day: selectedDay, title, time });
+        }
+
+        eventModal.hide();
+        renderCalendar(currentView);
+    });
+
+    function deleteEvent(index) {
+        events.splice(index, 1);
+        renderCalendar(currentView);
+    }
+
+    function updateActiveButton(view) {
+        document.getElementById('daily-view-btn').classList.remove('active');
+        document.getElementById('weekly-view-btn').classList.remove('active');
+        document.getElementById('monthly-view-btn').classList.remove('active');
+
+        if (view === 'daily') document.getElementById('daily-view-btn').classList.add('active');
+        if (view === 'weekly') document.getElementById('weekly-view-btn').classList.add('active');
+        if (view === 'monthly') document.getElementById('monthly-view-btn').classList.add('active');
+    }
+
+    document.getElementById('daily-view-btn').addEventListener('click', () => renderCalendar('daily'));
+    document.getElementById('weekly-view-btn').addEventListener('click', () => renderCalendar('weekly'));
+    document.getElementById('monthly-view-btn').addEventListener('click', () => renderCalendar('monthly'));
+
+    // Initial load
+    renderCalendar('monthly');
+</script>
+
+{% endblock %}

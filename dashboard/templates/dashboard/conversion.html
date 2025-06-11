@@ -1,0 +1,93 @@
+{% extends "dashboard/base.html" %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center">Unit Conversion</h2>
+    
+    <form action="{% url 'conversion' %}" method="POST">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="conversion_type">Conversion Type</label>
+            <select class="form-control" id="conversion_type" name="conversion_type" required>
+                <option disabled selected>Select conversion type</option>
+                <optgroup label="Length">
+                    <option value="meters">Meters</option>
+                    <option value="kilometers">Kilometers</option>
+                    <option value="centimeters">Centimeters</option>
+                    <option value="millimeters">Millimeters</option>
+                    <option value="inches">Inches</option>
+                    <option value="feet">Feet</option>
+                    <option value="yards">Yards</option>
+                    <option value="miles">Miles</option>
+                </optgroup>
+                <optgroup label="Weight">
+                    <option value="kilograms">Kilograms</option>
+                    <option value="grams">Grams</option>
+                    <option value="pounds">Pounds</option>
+                    <option value="ounces">Ounces</option>
+                </optgroup>
+                <optgroup label="Temperature">
+                    <option value="Celsius">Celsius</option>
+                    <option value="Fahrenheit">Fahrenheit</option>
+                    <option value="Kelvin">Kelvin</option>
+                </optgroup>
+                <optgroup label="Time">
+                    <option value="seconds">Seconds</option>
+                    <option value="minutes">Minutes</option>
+                    <option value="hours">Hours</option>
+                    <option value="days">Days</option>
+                </optgroup>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="input_value">Input Value</label>
+            <input type="number" class="form-control" id="input_value" name="input_value" placeholder="Enter value to convert" required>
+        </div>
+
+        <div class="form-group mb-2">
+            <label for="output_unit">Convert To</label>
+            <select class="form-control" id="output_unit" name="output_unit" required>
+                <option disabled selected>Select target unit</option>
+                <!-- Same options as the input unit -->
+                <optgroup label="Length">
+                    <option value="meters">Meters</option>
+                    <option value="kilometers">Kilometers</option>
+                    <option value="centimeters">Centimeters</option>
+                    <option value="millimeters">Millimeters</option>
+                    <option value="inches">Inches</option>
+                    <option value="feet">Feet</option>
+                    <option value="yards">Yards</option>
+                    <option value="miles">Miles</option>
+                </optgroup>
+                <optgroup label="Weight">
+                    <option value="kilograms">Kilograms</option>
+                    <option value="grams">Grams</option>
+                    <option value="pounds">Pounds</option>
+                    <option value="ounces">Ounces</option>
+                </optgroup>
+                <optgroup label="Temperature">
+                    <option value="Celsius">Celsius</option>
+                    <option value="Fahrenheit">Fahrenheit</option>
+                    <option value="Kelvin">Kelvin</option>
+                </optgroup>
+                <optgroup label="Time">
+                    <option value="seconds">Seconds</option>
+                    <option value="minutes">Minutes</option>
+                    <option value="hours">Hours</option>
+                    <option value="days">Days</option>
+                </optgroup>
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block">Convert</button>
+    </form>
+
+    <div class="mt-4">
+        {% if result %}
+            <h5>Converted Value: {{ result }}</h5>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

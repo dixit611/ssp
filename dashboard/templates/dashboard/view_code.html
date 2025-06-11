@@ -1,0 +1,20 @@
+{% extends 'dashboard/base.html' %}
+
+{% block content %}
+<div class="container">
+    <h2>Saved Code Snippets</h2>
+    {% if saved_codes %}
+        <ul>
+            {% for code_snippet in saved_codes %}
+                <li>
+                    <strong>Language:</strong> {{ code_snippet.language }}<br>
+                    <strong>Code:</strong>
+                    <pre>{{ code_snippet.code }}</pre>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No saved code for this email.</p>
+    {% endif %}
+</div>
+{% endblock %}

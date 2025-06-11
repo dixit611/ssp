@@ -1,0 +1,43 @@
+{% extends 'dashboard/base.html' %}
+{% load static %}
+{% block content %}
+
+<div class="container text-center mt-4">
+    <h2>Search W3Schools</h2>
+    <p class="fw-bold text-light bg-dark p-2">
+        Search topics like Programming Languages, MERN Stack, Frontend & Backend, Database, DSA, and more!
+    </p>
+
+    <form method="post" action="{% url 'w3schools_search' %}" class="mb-4">
+        {% csrf_token %}
+        <div class="mb-2 pe-3">
+            {{ form.as_p }}
+        </div>
+        <button type="submit" class="btn btn-danger">Search</button>
+    </form>
+
+    {% if results %}
+    <div class="card">
+        <div class="card-body">
+            <h3 class="card-title">Result for: <span class="text-success">{{ request.POST.text }}</span></h3>
+            <ul class="list-group">
+                {% for result in results %}
+                    <li class="list-group-item">
+                        <h5>
+                            <a href="{{ result.link }}" class="text-primary" target="_blank">
+                                {{ result.title }}
+                            </a>
+                        </h5>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    {% elif request.method == "POST" %}
+        <div class="alert alert-warning mt-3" role="alert">
+            No results found. Try searching for another topic.
+        </div>
+    {% endif %}
+</div>
+
+{% endblock %}

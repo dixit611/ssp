@@ -1,0 +1,211 @@
+{% extends 'dashboard/base.html' %}
+{% block content %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/css/bootstrap.min.css">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
+<style>
+  #video-controls {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.7);
+    border-radius: 15px;
+    padding: 10px 20px;
+    display: flex;
+    gap: 15px;
+    z-index: 999;
+  }
+  #video-controls i {
+    font-size: 24px;
+    color: white;
+    cursor: pointer;
+  }
+  #chatBox {
+    position: fixed;
+    right: 0;
+    bottom: 80px;
+    width: 250px;
+    height: 300px;
+    background: white;
+    border: 1px solid #ccc;
+    display: none;
+    flex-direction: column;
+  }
+  #chatMessages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px;
+  }
+  #chatInput {
+    border-top: 1px solid #ccc;
+  }
+</style>
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-6">
+      <video id="localVideo" autoplay muted playsinline class="w-100 border rounded shadow-sm"></video>
+    </div>
+    <div class="col-6">
+      <video id="remoteVideo" autoplay playsinline class="w-100 border rounded shadow-sm"></video>
+    </div>
+  </div>
+</div>
+
+<!-- Control panel -->
+<div id="video-controls">
+  <i id="toggleVideo" class="bi bi-camera-video-fill" title="Toggle Camera"></i>
+  <i id="toggleAudio" class="bi bi-mic-fill" title="Toggle Microphone"></i>
+  <i id="screenShare" class="bi bi-display" title="Share Screen"></i>
+  <i id="shareLink" class="bi bi-link-45deg" title="Copy Invite Link"></i>
+  <i id="addFriend" class="bi bi-person-plus-fill" title="Add Friend"></i>
+  <i id="toggleChat" class="bi bi-chat-left-dots-fill" title="Toggle Chat"></i>
+  <i id="leaveCall" class="bi bi-x-circle-fill text-danger" title="Leave"></i>
+</div>
+
+<!-- Chat box -->
+<div id="chatBox" class="d-flex">
+  <div id="chatMessages"></div>
+  <input type="text" id="chatInput" placeholder="Type..." class="form-control border-0 rounded-0">
+</div>
+
+<script src="https://cdn.socket.io/4.3.2/socket.io.min.js"></script>
+<script>
+const socket = io("http://localhost:5000");  // Adjust as needed
+const roomId = new URLSearchParams(window.location.search).get('room') || Math.floor(Math.random() * 10000);
+const localVideo = document.getElementById("localVideo");
+const remoteVideo = document.getElementById("remoteVideo");
+let localStream;
+let peerConnection;
+const config = { iceServers: [{ urls: "stun:stun.l.google.com:19302" }] };
+
+// Join room
+socket.emit("join", roomId);
+socket.on("joined", async () => {
+  try {
+    // Get user media (camera and microphone)
+    localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+    localVideo.srcObject = localStream;  // Show local video
+    console.log("Local stream started.");
+
+    peerConnection = new RTCPeerConnection(config);
+    localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+    peerConnection.ontrack = e => remoteVideo.srcObject = e.streams[0];
+    peerConnection.onicecandidate = e => {
+      if (e.candidate) socket.emit("candidate", roomId, e.candidate);
+    };
+
+    const offer = await peerConnection.createOffer();
+    await peerConnection.setLocalDescription(offer);
+    socket.emit("offer", roomId, offer);
+  } catch (err) {
+    console.error("Error getting media devices:", err);
+  }
+});
+
+socket.on("offer", async offer => {
+  try {
+    localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+    localVideo.srcObject = localStream;
+
+    peerConnection = new RTCPeerConnection(config);
+    localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+    peerConnection.ontrack = e => remoteVideo.srcObject = e.streams[0];
+    peerConnection.onicecandidate = e => {
+      if (e.candidate) socket.emit("candidate", roomId, e.candidate);
+    };
+
+    await peerConnection.setRemoteDescription(offer);
+    const answer = await peerConnection.createAnswer();
+    await peerConnection.setLocalDescription(answer);
+    socket.emit("answer", roomId, answer);
+  } catch (err) {
+    console.error("Error in offer handling:", err);
+  }
+});
+
+socket.on("answer", async answer => {
+  try {
+    await peerConnection.setRemoteDescription(answer);
+  } catch (err) {
+    console.error("Error handling answer:", err);
+  }
+});
+
+socket.on("candidate", async candidate => {
+  try {
+    await peerConnection.addIceCandidate(candidate);
+  } catch (err) {
+    console.error("Error adding ICE candidate:", err);
+  }
+});
+
+// Controls for toggling video/audio
+let cameraOn = true;  // Camera is on by default
+let audioOn = true;   // Audio is on by default
+
+document.getElementById("toggleVideo").onclick = () => {
+  cameraOn = !cameraOn;
+  const videoTrack = localStream.getVideoTracks()[0];
+  videoTrack.enabled = cameraOn;  // Toggle camera state
+  document.getElementById("toggleVideo").classList.toggle("bi-camera-video-off", !cameraOn);
+  document.getElementById("toggleVideo").classList.toggle("bi-camera-video-fill", cameraOn);
+};
+
+document.getElementById("toggleAudio").onclick = () => {
+  audioOn = !audioOn;
+  const audioTrack = localStream.getAudioTracks()[0];
+  audioTrack.enabled = audioOn;  // Toggle microphone state
+  document.getElementById("toggleAudio").classList.toggle("bi-mic-mute", !audioOn);
+  document.getElementById("toggleAudio").classList.toggle("bi-mic-fill", audioOn);
+};
+
+document.getElementById("screenShare").onclick = async () => {
+  try {
+    const screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+    const screenTrack = screenStream.getVideoTracks()[0];
+    const sender = peerConnection.getSenders().find(s => s.track.kind === "video");
+    sender.replaceTrack(screenTrack);
+    screenTrack.onended = () => sender.replaceTrack(localStream.getVideoTracks()[0]);
+  } catch (err) {
+    console.error("Error sharing screen:", err);
+  }
+};
+
+document.getElementById("leaveCall").onclick = () => {
+  if (peerConnection) peerConnection.close();
+  window.location.href = "{% url 'home' %}";  // Adjust URL
+};
+
+document.getElementById("shareLink").onclick = () => {
+  const link = `${window.location.origin}${window.location.pathname}?room=${roomId}`;
+  navigator.clipboard.writeText(link);
+  alert("Room link copied!");
+};
+
+document.getElementById("addFriend").onclick = () => {
+  window.location.href = `${window.location.pathname}?room=${roomId}`;
+};
+
+// Chat functionality
+const chatBox = document.getElementById("chatBox");
+document.getElementById("toggleChat").onclick = () => {
+  chatBox.style.display = chatBox.style.display === "none" ? "flex" : "none";
+};
+
+document.getElementById("chatInput").addEventListener("keypress", e => {
+  if (e.key === "Enter") {
+    const message = e.target.value;
+    socket.emit("chat", roomId, message);
+    e.target.value = "";
+  }
+});
+
+socket.on("chat", msg => {
+  const div = document.createElement("div");
+  div.textContent = msg;
+  document.getElementById("chatMessages").appendChild(div);
+});
+</script>
+{% endblock %}

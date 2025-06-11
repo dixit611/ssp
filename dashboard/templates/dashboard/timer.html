@@ -1,0 +1,74 @@
+{% extends 'dashboard/base.html' %}
+{% load static %}
+{% block content %}
+<section class="container text-center mt-5">
+  <h3>Study Timer</h3>
+  <div class="row justify-content-center">
+    <div class="col-md-4">
+      <div class="card shadow">
+        <div class="card-body">
+          <h5 class="card-title">Stopwatch</h5>
+          <div id="stopwatch" class="display-4">00:00:00</div>
+          <div class="mt-3">
+            <button id="startBtn" class="btn btn-success">Start</button>
+            <button id="stopBtn" class="btn btn-danger">Stop</button>
+            <button id="resetBtn" class="btn btn-secondary">Reset</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% block extra_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    let stopwatchInterval;
+    let seconds = 0;
+    let running = false;
+
+    const stopwatchDisplay = document.getElementById('stopwatch');
+
+    function updateStopwatch() {
+      const hours = String(Math.floor(seconds / 3600)).padStart(2, '0');
+      const minutes = String(Math.floor((seconds % 3600) / 60)).padStart(2, '0');
+      const secs = String(seconds % 60).padStart(2, '0');
+      stopwatchDisplay.textContent = `${hours}:${minutes}:${secs}`;
+    }
+
+    function startStopwatch() {
+      if (!running) {
+        running = true;
+        stopwatchInterval = setInterval(() => {
+          seconds++;
+          updateStopwatch();
+        }, 1000);
+        document.getElementById('startBtn').disabled = true;
+        document.getElementById('stopBtn').disabled = false;
+      }
+    }
+
+    function stopStopwatch() {
+      if (running) {
+        running = false;
+        clearInterval(stopwatchInterval);
+        document.getElementById('startBtn').disabled = false;
+        document.getElementById('stopBtn').disabled = true;
+      }
+    }
+
+    function resetStopwatch() {
+      clearInterval(stopwatchInterval);
+      seconds = 0;
+      updateStopwatch();
+      document.getElementById('startBtn').disabled = false;
+      document.getElementById('stopBtn').disabled = true;
+    }
+
+    document.getElementById('startBtn').addEventListener('click', startStopwatch);
+    document.getElementById('stopBtn').addEventListener('click', stopStopwatch);
+    document.getElementById('resetBtn').addEventListener('click', resetStopwatch);
+  });
+</script>
+{% endblock %}
+{% endblock content %}

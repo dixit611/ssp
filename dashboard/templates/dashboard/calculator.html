@@ -1,0 +1,305 @@
+{% extends 'dashboard/base.html' %}
+{% load static %}
+{% block content %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scientific Calculator</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <script defer src="{% static 'calculator/calculator.js' %}"></script>
+    <style>
+        .calculator {
+            background-color: #f8f9fa;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            padding: 20px;
+        }
+        .btn-outline-primary {
+            border-color: #007bff;
+            color: #007bff;
+        }
+        .btn-outline-primary:hover {
+            background-color: #007bff;
+            color: white;
+        }
+        .btn-clear {
+            background-color: #dc3545;
+            color: white;
+        }
+        .btn-clear:hover {
+            background-color: #c82333;
+        }
+        .btn-equal {
+            background-color: #28a745;
+            color: white;
+        }
+        .btn-equal:hover {
+            background-color: #218838;
+        }
+        .button-row {
+            margin-bottom: 5px;
+        }
+        .btn-group .btn {
+            border-radius: 0;
+        }
+        .btn-group .btn:last-child {
+            border-right: none;
+        }
+        .btn{
+          margin:5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5 d-flex justify-content-center">
+        <div class="calculator w-100" style="max-width: 400px;">
+            <h2 class="text-center mb-4">Scientific Calculator</h2>
+            <textarea id="history" rows="4" class="form-control mb-3" readonly></textarea>
+            <input type="text" id="expression1" class="form-control mb-3" readonly>
+            <div class="row">
+                <div class="col-3">
+                    <button type="button" class="btn btn-outline-primary btn-block" onclick="answer()">Ans</button>
+                </div>
+                <div class="col-3">
+                    <button type="button" class="btn btn-outline-primary btn-block" onclick="sinfn()">sin</button>
+                </div>
+                <div class="col-3">
+                    <button type="button" class="btn btn-outline-primary btn-block" onclick="cosfn()">cos</button>
+                </div>
+                <div class="col-3">
+                    <button type="button" class="btn btn-outline-primary btn-block" onclick="tanfn()">tan</button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-3">
+                    <button type="button" class="btn btn-outline-primary btn-block" onclick="exp()">EXP</button>
+                </div>
+                <div class="col-3">
+                    <button type="button" class="btn btn-outline-primary btn-block" onclick="percentage()">%</button>
+                </div>
+                <div class="col-3">
+                    <button type="button" class="btn btn-outline-primary btn-block" onclick="pi()">π</button>
+                </div>
+                <div class="col-3">
+                    <button type="button" class="btn btn-outline-primary btn-block" onclick="e()">e</button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-3">
+                    <button type="button" class="btn btn-outline-primary btn-block" onclick="lnfn()">ln</button>
+                </div>
+                <div class="col-3">
+                    <button type="button" class="btn btn-outline-primary btn-block" onclick="logfn()">log</button>
+                </div>
+                <div class="col-3">
+                    <button type="button" class="btn btn-outline-primary btn-block" onclick="factorial()">!</button>
+                </div>
+                <div class="col-3">
+                    <button type="button" class="btn btn-outline-primary btn-block" onclick="squareroot()">√</button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-3">
+                    <button type="button" class="btn btn-outline-primary btn-block" onclick="power()">x³</button>
+                </div>
+                <div class="col-3">
+                    <button type="button" class="btn btn-outline-primary btn-block" onclick="square()">x²</button>
+                </div>
+                <div class="col-3">
+                    <button type="button" class="btn btn-outline-primary btn-block" onclick="abs()">|x|</button>
+                </div>
+                <div class="col-3">
+                    <button type="button" class="btn btn-clear btn-block" onclick="clearDisplay()">C</button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-3">
+                    <button type="button" class="btn btn-outline-primary btn-block" onclick="display('(')">&#40;</button>
+                </div>
+                <div class="col-3">
+                    <button type="button" class="btn btn-outline-primary btn-block" onclick="display(')')">&#41;</button>
+                </div>
+                <div class="col-3">
+                    <button type="button" class="btn btn-outline-primary btn-block" onclick="display('7')">7</button>
+                </div>
+                <div class="col-3">
+                    <button type="button" class="btn btn-outline-primary btn-block" onclick="display('8')">8</button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-3">
+                    <button type="button" class="btn btn-outline-primary btn-block" onclick="display('4')">4</button>
+                </div>
+                <div class="col-3">
+                    <button type="button" class="btn btn-outline-primary btn-block" onclick="display('5')">5</button>
+                </div>
+                <div class="col-3">
+                    <button type="button" class="btn btn-outline-primary btn-block" onclick="display('2')">2</button>
+                </div>
+                <div class="col-3">
+                    <button type="button" class="btn btn-outline-primary btn-block" onclick="display('.')">.</button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-3">
+                    <button type="button" class="btn btn-outline-primary btn-block" onclick="display('1')">1</button>
+                </div>
+                <div class="col-3">
+                    <button type="button" class="btn btn-outline-primary btn-block" onclick="display('3')">3</button>
+                </div>
+                <div class="col-3">
+                    <button type="button" class="btn btn-outline-primary btn-block" onclick="display('0')">0</button>
+                </div>
+                <div class="col-3">
+                    <button type="button" class="btn btn-equal btn-block" onclick="calculate()">=</button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-3">
+                    <button type="button" class="btn btn-outline-primary btn-block" onclick="back()">⌫</button>
+                </div>
+                <div class="col-3">
+                    <button type="button" class="btn btn-outline-primary btn-block" onclick="display('/')">÷</button>
+                </div>
+                <div class="col-3">
+                    <button type="button" class="btn btn-outline-primary btn-block" onclick="display('*')">×</button>
+                </div>
+                <div class="col-3">
+                    <button type="button" class="btn btn-outline-primary btn-block" onclick="display('-')">-</button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <button type="button" class="btn btn-outline-primary btn-block" onclick="display('+')">+</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
+
+
+<script>
+
+  // Store the last result
+  let lastResult = 0;
+
+  function display(value) {
+      const expression = document.getElementById('expression1');
+      expression.value += value;
+  }
+  
+  function clearDisplay() {
+      document.getElementById('expression1').value = '';
+      document.getElementById('history').value = '';
+  }
+  
+  function back() {
+      const expression = document.getElementById('expression1');
+      expression.value = expression.value.slice(0, -1);
+  }
+  
+  function answer() {
+      const history = document.getElementById('history');
+      history.value += `\n${document.getElementById('expression1').value} = ${lastResult}`;
+  }
+  
+  function calculate() {
+      const expression = document.getElementById('expression1');
+      try {
+          let exp = expression.value.replace(/×/g, '*').replace(/÷/g, '/');
+          lastResult = eval(exp); // Note: eval should be used with caution
+          expression.value = lastResult;
+          document.getElementById('history').value += `\n${expression.value} = ${lastResult}`;
+      } catch (e) {
+          expression.value = 'Error';
+      }
+  }
+  
+  function sinfn() {
+      calculateFunction(Math.sin);
+  }
+  
+  function cosfn() {
+      calculateFunction(Math.cos);
+  }
+  
+  function tanfn() {
+      calculateFunction(Math.tan);
+  }
+  
+  function exp() {
+      calculateFunction(Math.exp);
+  }
+  
+  function percentage() {
+      const expression = document.getElementById('expression1');
+      let value = parseFloat(expression.value);
+      expression.value = value / 100;
+  }
+  
+  function pi() {
+      document.getElementById('expression1').value += Math.PI;
+  }
+  
+  function e() {
+      document.getElementById('expression1').value += Math.E;
+  }
+  
+  function lnfn() {
+      calculateFunction(Math.log);
+  }
+  
+  function logfn() {
+      calculateFunction(Math.log10);
+  }
+  
+  function factorial() {
+      const expression = document.getElementById('expression1');
+      let value = parseInt(expression.value, 10);
+      let result = 1;
+      for (let i = 1; i <= value; i++) {
+          result *= i;
+      }
+      expression.value = result;
+  }
+  
+  function squareroot() {
+      calculateFunction(Math.sqrt);
+  }
+  
+  function power() {
+      calculateFunction((x) => Math.pow(x, 3));
+  }
+  
+  function square() {
+      calculateFunction((x) => x * x);
+  }
+  
+  function abs() {
+      calculateFunction(Math.abs);
+  }
+  
+  function calculateFunction(func) {
+      const expression = document.getElementById('expression1');
+      try {
+          let value = parseFloat(expression.value);
+          if (isNaN(value)) throw new Error('Invalid number');
+          expression.value = func(value);
+      } catch (e) {
+          expression.value = 'Error';
+      }
+  }
+  
+
+
+
+</script>
+
+{% endblock content %}

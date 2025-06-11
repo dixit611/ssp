@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <title>Student Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+  <!-- jQuery -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous" />
+</head>
+
+<body>
+  <header>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="{% url 'home' %}">Student Study Portal</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse justify-content-end" id="navbarSupportedContent">
+          <ul class="navbar-nav mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="{% url 'home' %}">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'profile' %}">Profile</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'time_table' %}">Time Table</a>
+            </li>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Options 1
+              </a>
+              <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                <a class="dropdown-item" href="{% url 'books' %}">Books</a>
+                <a class="dropdown-item" href="{% url 'wiki' %}">Wikipedia</a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="{% url 'dictionary' %}">Dictionary</a>
+                <a class="dropdown-item" href="{% url 'youtube' %}">YouTube</a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="{% url 'todo' %}">To-do</a>
+                <a class="dropdown-item" href="{% url 'homework' %}">Homework</a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="{% url 'notes' %}">Notes</a>
+                <a class="dropdown-item" href="{% url 'conversion' %}">Conversion</a>
+                
+              </div>
+            </li>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Options 2
+              </a>
+              <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="{% url 'editor' %}">Code Editor</a>
+                <a class="dropdown-item" href="{% url 'duckduckgo_search' %}">DuckDuckGo</a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="{% url 'calculator' %}">Scientific Calculator</a>
+                <a class="dropdown-item" href="{% url 'general' %}">Rough writing</a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="{% url 'w3schools_search' %}">W3schools_search</a>
+                <a class="dropdown-item" href="{% url 'timer' %}">Stop Watch</a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="{% url 'typing' %}">Typing Editor</a>
+                <a class="dropdown-item" href="{% url 'videocall' %}">Video Calls</a>
+              </div>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'register' %}">Register</a>
+            </li>
+            {% if request.user.is_authenticated %}
+            <button class="btn btn-success">
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+              </li>
+            </button>
+            {% else %}
+            <button class="btn btn-success">
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'login_page' %}">Login</a>
+              </li>
+            </button>
+            {% endif %}
+          </ul>
+        </div>
+      </div>
+    </nav>
+  </header>
+  <br /><br />
+  <main>
+    {% if messages %}
+      {% for msg in messages %}
+      <div class="alert alert-{{ msg.tags }}">{{ msg }}</div>
+      {% endfor %}
+    {% endif %}
+    {% block content %}
+    {% endblock content %}
+  </main>
+  <br /><br />
+  <footer class="bg-dark text-light py-4">
+    <div class="container text-center">
+      <div class="row">
+        <div class="col-12">
+          <!-- Social Media Links -->
+          <a target="blank" href="https://www.linkedin.com/in/aman-dixit-surhan/" class="text-light me-3"><i class="fab fa-linkedin fa-2x" style="color: #0077b5;"></i></a>
+          <a target="blank" href="https://github.com/dixit611" class="text-light me-3" ><i class="fab fa-github fa-2x"></i></a>
+          <a target="blank" href="mailto:dixitaman611@gmail.com" class="text-light me-3"><i class="fas fa-envelope fa-2x" style="color: #d14836;"></i></a>
+          <a target="blank" href="https://t.me/creativedixitaman" class="text-light me-3"><i class="fab fa-telegram fa-2x"  style="color: #0088cc;"></i></a>
+          <a target="blank" href="https://wa.me/916386676301" class="text-light me-3" ><i class="fab fa-whatsapp fa-2x" style="color: #25d366;"></i></a>
+          <a target="blank" href="https://youtube.com/@amandixitsurhan1136?feature=shared" class="text-light me-3"><i class="fab fa-youtube fa-2x" style="color: #ff0000;"></i></a>
+        </div>
+      </div>
+      <div class="row mt-3">
+        <div class="col-12">
+          <p class="mb-0">&copy; dixitaman611@. All rights reserved 2024 {{ current_year }} .</p>
+        </div>
+      </div>
+      <div class="row mt-3">
+        <div class="col-12">
+          <!-- Extra Links Section -->
+          <a target="blank" href="https://www.example.com" class="text-light me-3"><i style="color: #ff0000;">Example 1</i></a>
+          <a target="blank" href="https://aman-dixit-portfo.netlify.app" class="text-light me-3"><i style="color: #ff0000;">Portfolio</i></a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Bootstrap JS and Popper.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
+</body>
+
+</html>
