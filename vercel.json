@@ -1,18 +1,21 @@
 {
   "builds": [
     {
-      "src": "api/index.py",
-      "use": "@vercel/python"
+      "src": "wsgi.py",
+      "use": "@vercel/python",
+      "config": {
+        "maxLambdaSize": "50mb",
+        "includeFiles": ["**/*"],
+        "env": {
+          "DJANGO_SETTINGS_MODULE": "studentstudyportal.settings"
+        }
+      }
     }
   ],
   "routes": [
     {
-      "src": "/static/(.*)",
-      "dest": "/static/$1"
-    },
-    {
       "src": "/(.*)",
-      "dest": "api/index.py"
+      "dest": "wsgi.py"
     }
   ]
 }

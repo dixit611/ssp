@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: student-study-portal
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn studentstudyportal.wsgi
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: studentstudyportal.settings
+      - key: PYTHON_VERSION
+        value: 3.12
+      - key: SECRET_KEY
+        value: your_secret_key_here
+      - key: DEBUG
+        value: False
